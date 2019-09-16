@@ -157,19 +157,19 @@ namespace PersonDatabase.Core
                 int tempSelection = 0;
                 if (Int32.TryParse(Console.ReadLine(), out tempSelection))
                 {
-                    for (int i = 0; i < myPersons.Count; i++)
-                    {
-                        if (tempSelection == myPersons[i].GetID())
-                        {
-                            File.Delete(Path.GetFullPath("Database/" + myPersons[i].GetID() + ".txt"));
-                            myPersons.RemoveAt(i);
-                            i--;
-                        }
-                    }
-
                     if (tempSelection == 0)
                     {
                         tempDone = true;
+                        return;
+                    }
+
+                    if (!DeletePerson(tempSelection))
+                    {
+                        Console.Clear();
+
+                        Print.PrintColorText("That ID does not exist!\n\n", ConsoleColor.Red);
+                        Print.PrintColorText("Press ENTER to return\n", ConsoleColor.Red);
+                        Console.ReadKey();
                     }
                 }
                 else
@@ -181,6 +181,27 @@ namespace PersonDatabase.Core
                 }
 
             } while (!tempDone);
+        }
+
+        /// <summary>
+        /// Deletes a person from disk
+        /// </summary>
+        /// <param name="anID">The ID of the person to remove from disk</param>
+        /// <returns>Returns wether or not the person actually exists</returns>
+        bool DeletePerson(int anID)
+        {
+            for (int i = 0; i < myPersons.Count; i++)
+            {
+                if (anID == myPersons[i].GetID())
+                {
+                    File.Delete(Path.GetFullPath("Database/" + myPersons[i].GetID() + ".txt"));
+                    myPersons.RemoveAt(i);
+                    i--;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -262,27 +283,19 @@ namespace PersonDatabase.Core
                 int tempSelection = 0;
                 if (Int32.TryParse(Console.ReadLine(), out tempSelection))
                 {
-                    for (int i = 0; i < myPersons.Count; i++)
-                    {
-                        if (tempSelection == myPersons[i].GetID())
-                        {
-                            Console.Clear();
-
-                            Print.PrintColorText("Name: " + myPersons[i].GetName().Item1 + "\n", ConsoleColor.Yellow);
-                            Print.PrintColorText("Lastname: " + myPersons[i].GetName().Item2 + "\n", ConsoleColor.Yellow);
-
-                            //IMPROVE DATE VIEW
-                            Print.PrintColorText("Birthdate: " + ConvertDateString(myPersons[i].GetBirthdate()) + "\n", ConsoleColor.Yellow);
-
-                            Console.WriteLine("");
-                            Print.PrintColorText("Press ENTER to exit \n", ConsoleColor.Green);
-                            Console.ReadKey();
-                        }
-                    }
-
                     if (tempSelection == 0)
                     {
                         tempDone = true;
+                        return;
+                    }
+
+                    if (!ShowPerson(tempSelection))
+                    {
+                        Console.Clear();
+
+                        Print.PrintColorText("That ID does not exist!\n\n", ConsoleColor.Red);
+                        Print.PrintColorText("Press ENTER to return\n", ConsoleColor.Red);
+                        Console.ReadKey();
                     }
                 }
                 else
@@ -294,6 +307,35 @@ namespace PersonDatabase.Core
                 }
 
             } while (!tempDone);
+        }
+
+        /// <summary>
+        /// Shows a person with a certain ID
+        /// </summary>
+        /// <param name="anID">The ID of the person to show</param>
+        /// <returns>Returns wether or not the person actually exists</returns>
+        bool ShowPerson(int anID)
+        {
+            for (int i = 0; i < myPersons.Count; i++)
+            {
+                if (anID == myPersons[i].GetID())
+                {
+                    Console.Clear();
+
+                    Print.PrintColorText("Name: " + myPersons[i].GetName().Item1 + "\n", ConsoleColor.Yellow);
+                    Print.PrintColorText("Lastname: " + myPersons[i].GetName().Item2 + "\n", ConsoleColor.Yellow);
+
+                    Print.PrintColorText("Birthdate: " + ConvertDateString(myPersons[i].GetBirthdate()) + "\n", ConsoleColor.Yellow);
+
+                    Console.WriteLine("");
+                    Print.PrintColorText("Press ENTER to exit \n", ConsoleColor.Green);
+                    Console.ReadKey();
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
