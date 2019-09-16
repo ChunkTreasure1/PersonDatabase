@@ -23,28 +23,37 @@ namespace PersonDatabase.Core
                 Print.PrintColorText("3. Access Person\n", ConsoleColor.DarkCyan);
                 Print.PrintColorText("0. Exit Program\n", ConsoleColor.DarkCyan);
 
-                //MAKE MORE SECURE
-                int tempChoice = Int32.Parse(Console.ReadLine());
-                if (tempChoice == 1)
+                int tempChoice = 0;
+                if (Int32.TryParse(Console.ReadLine(), out tempChoice))
                 {
-                    AddPerson();
-                }
-                else if (tempChoice == 2)
-                {
-                    RemovePerson();
-                }
-                else if(tempChoice == 3)
-                {
-                    AccessPerson();
-                }
-                else if(tempChoice == 0)
-                {
-                    Environment.Exit(0);
+                    if (tempChoice == 1)
+                    {
+                        AddPerson();
+                    }
+                    else if (tempChoice == 2)
+                    {
+                        RemovePerson();
+                    }
+                    else if (tempChoice == 3)
+                    {
+                        AccessPerson();
+                    }
+                    else if (tempChoice == 0)
+                    {
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Print.PrintColorText(tempChoice + " is not a choice!\n", ConsoleColor.Red);
+                        Console.ReadKey();
+                    }
                 }
                 else
                 {
                     Console.Clear();
-                    Print.PrintColorText(tempChoice + " is not a choice!\n", ConsoleColor.Red);
+                    Print.PrintColorText("That is not a number!\n\n", ConsoleColor.Red);
+                    Print.PrintColorText("Press ENTER to return", ConsoleColor.Red);
                     Console.ReadKey();
                 }
             }
@@ -63,19 +72,58 @@ namespace PersonDatabase.Core
             Print.PrintColorText("Enter birthdate(YYMMDD): ", ConsoleColor.Green);
             string tempBirthdate = Console.ReadLine();
 
-            myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, (myLastID + 1)));
-
-            string tempPath = tempPath = Path.GetFullPath("Database/" + (myLastID + 1) + ".txt");
-
-            if (!File.Exists(tempPath))
+            if (!CheckForExisting(new Tuple<string, string>(tempName, tempLastname)))
             {
-                using (StreamWriter tempSW = File.CreateText(tempPath))
-                {
-                    tempSW.WriteLine(tempName + ";" + tempLastname + ";" + tempBirthdate + ";" + (myLastID + 1));
-                }
-            }
+                myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, (myLastID + 1)));
 
-            myLastID++;
+                string tempPath = tempPath = Path.GetFullPath("Database/" + (myLastID + 1) + ".txt");
+
+                if (!File.Exists(tempPath))
+                {
+                    using (StreamWriter tempSW = File.CreateText(tempPath))
+                    {
+                        tempSW.WriteLine(tempName + ";" + tempLastname + ";" + tempBirthdate + ";" + (myLastID + 1));
+                    }
+                }
+
+                myLastID++;
+            }
+            else
+            {
+                bool tempDone = false;
+
+                do
+                {
+                    Console.Clear();
+
+                    Print.PrintColorText("Person already exists!\n\n", ConsoleColor.Red);
+                    Print.PrintColorText("Do you want to override?(Y/N)", ConsoleColor.Red);
+
+                    string tempString = Console.ReadLine();
+                    if (tempString == "Y" || tempString == "y")
+                    {
+                        string tempPath = tempPath = Path.GetFullPath("Database/" + GetIDFromPerson(new Tuple<string, string>(tempName, tempLastname)) + ".txt");
+                        File.Delete(tempPath);
+
+                        myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, (myLastID + 1)));
+                        if (!File.Exists(tempPath))
+                        {
+                            using (StreamWriter tempSW = File.CreateText(tempPath))
+                            {
+                                tempSW.WriteLine(tempName + ";" + tempLastname + ";" + tempBirthdate + ";" + (myLastID + 1));
+                            }
+                        }
+
+                        Print.PrintColorText("Person overridden!\n", ConsoleColor.Red);
+                        tempDone = true;
+                    }
+                    else
+                    {
+                        tempDone = true;
+                    }
+
+                } while (!tempDone);
+            }
             Print.PrintColorText("Press ENTER to exit", ConsoleColor.Green);
             Console.ReadKey();
         }
@@ -95,21 +143,30 @@ namespace PersonDatabase.Core
                     Print.PrintColorText(myPersons[i].GetID() + ". " + myPersons[i].GetName().Item1 + " " + myPersons[i].GetName().Item2 + "\n", ConsoleColor.Green);
                 }
 
-                //MAKE MORE SECURE
-                int tempSelection = Int32.Parse(Console.ReadLine());
-                for (int i = 0; i < myPersons.Count; i++)
+                int tempSelection = 0;
+                if (Int32.TryParse(Console.ReadLine(), out tempSelection))
                 {
-                    if (tempSelection == myPersons[i].GetID())
+                    for (int i = 0; i < myPersons.Count; i++)
                     {
-                        File.Delete(Path.GetFullPath("Database/" + myPersons[i].GetID() + ".txt"));
-                        myPersons.RemoveAt(i);
-                        i--;
+                        if (tempSelection == myPersons[i].GetID())
+                        {
+                            File.Delete(Path.GetFullPath("Database/" + myPersons[i].GetID() + ".txt"));
+                            myPersons.RemoveAt(i);
+                            i--;
+                        }
+                    }
+
+                    if (tempSelection == 0)
+                    {
+                        tempDone = true;
                     }
                 }
-
-                if (tempSelection == 0)
+                else
                 {
-                    tempDone = true;
+                    Console.Clear();
+                    Print.PrintColorText("That is not a number!\n\n", ConsoleColor.Red);
+                    Print.PrintColorText("Press ENTER to return", ConsoleColor.Red);
+                    Console.ReadKey();
                 }
 
             } while (!tempDone);
@@ -173,32 +230,78 @@ namespace PersonDatabase.Core
                     Print.PrintColorText(myPersons[i].GetID() + ". " + myPersons[i].GetName().Item1 + " " + myPersons[i].GetName().Item2 + "\n", ConsoleColor.Green);
                 }
 
-                //MAKE MORE SECURE
-                int tempSelection = Int32.Parse(Console.ReadLine());
-                for (int i = 0; i < myPersons.Count; i++)
+                int tempSelection = 0;
+                if (Int32.TryParse(Console.ReadLine(), out tempSelection))
                 {
-                    if (tempSelection == myPersons[i].GetID())
+                    for (int i = 0; i < myPersons.Count; i++)
                     {
-                        Console.Clear();
+                        if (tempSelection == myPersons[i].GetID())
+                        {
+                            Console.Clear();
 
-                        Print.PrintColorText("Name: " + myPersons[i].GetName().Item1 + "\n", ConsoleColor.Yellow);
-                        Print.PrintColorText("Lastname: " + myPersons[i].GetName().Item2 + "\n", ConsoleColor.Yellow);
+                            Print.PrintColorText("Name: " + myPersons[i].GetName().Item1 + "\n", ConsoleColor.Yellow);
+                            Print.PrintColorText("Lastname: " + myPersons[i].GetName().Item2 + "\n", ConsoleColor.Yellow);
 
-                        //IMPROVE DATE VIEW
-                        Print.PrintColorText("Birthdate: " + myPersons[i].GetBirthdate() + "\n", ConsoleColor.Yellow);
+                            //IMPROVE DATE VIEW
+                            Print.PrintColorText("Birthdate: " + ConvertDateString(myPersons[i].GetBirthdate()) + "\n", ConsoleColor.Yellow);
 
-                        Console.WriteLine("");
-                        Print.PrintColorText("Press ENTER to exit \n", ConsoleColor.Green);
-                        Console.ReadKey();
+                            Console.WriteLine("");
+                            Print.PrintColorText("Press ENTER to exit \n", ConsoleColor.Green);
+                            Console.ReadKey();
+                        }
+                    }
+
+                    if (tempSelection == 0)
+                    {
+                        tempDone = true;
                     }
                 }
-
-                if (tempSelection == 0)
+                else
                 {
-                    tempDone = true;
+                    Console.Clear();
+                    Print.PrintColorText("That is not a number!\n\n", ConsoleColor.Red);
+                    Print.PrintColorText("Press ENTER to return", ConsoleColor.Red);
+                    Console.ReadKey();
                 }
 
             } while (!tempDone);
+        }
+
+        bool CheckForExisting(Tuple<string, string> aName)
+        {
+            for (int i = 0; i < myPersons.Count; i++)
+            {
+                if (aName.Item1 == myPersons[i].GetName().Item1 && 
+                    aName.Item2 == myPersons[i].GetName().Item2)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        string ConvertDateString(string aString)
+        {
+            string tempString = aString;
+
+            tempString = tempString.Insert(2, "/");
+            tempString = tempString.Insert(5, "/");
+
+            return tempString;
+        }
+
+        string GetIDFromPerson(Tuple<string, string> aName)
+        {
+            for (int i = 0; i < myPersons.Count; i++)
+            {
+                if (myPersons[i].GetName().Item1 == aName.Item1 && 
+                    myPersons[i].GetName().Item2 == aName.Item2)
+                {
+                    return myPersons[i].GetID().ToString();
+                }
+            }
+
+            return "";
         }
     }
 }
