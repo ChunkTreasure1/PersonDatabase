@@ -17,6 +17,7 @@ namespace PersonDatabase.Core
         //Getting
         public Tuple<string, string> GetName() { return Tuple.Create(myFirstname, myLastname); }
         public string GetBirthdate() { return myBirthdate; }
+        public int GetID() { return myId; }
 
         //Setting
         public void SetName(string aFirstname, string aLastname) { myFirstname = aFirstname; myLastname = aLastname; }
