@@ -9,6 +9,9 @@ namespace PersonDatabase.Core
         private List<Person> myPersons = new List<Person>();
         private int myLastID = 0;
 
+        /// <summary>
+        /// Runs the main program
+        /// </summary>
         public void Run()
         {
             bool tempInMenu = true;
@@ -40,7 +43,7 @@ namespace PersonDatabase.Core
                     }
                     else if (tempChoice == 0)
                     {
-                        Environment.Exit(0);
+                        tempInMenu = false;
                     }
                     else
                     {
@@ -59,6 +62,9 @@ namespace PersonDatabase.Core
             }
         }
 
+        /// <summary>
+        /// Adds a person to the database
+        /// </summary>
         void AddPerson()
         {
             Console.Clear();
@@ -72,6 +78,7 @@ namespace PersonDatabase.Core
             Print.PrintColorText("Enter birthdate(YYMMDD): ", ConsoleColor.Green);
             string tempBirthdate = Console.ReadLine();
 
+            //Checks if the person exists in the database
             if (!CheckForExisting(new Tuple<string, string>(tempName, tempLastname)))
             {
                 myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, (myLastID + 1)));
@@ -92,6 +99,7 @@ namespace PersonDatabase.Core
             {
                 bool tempDone = false;
 
+                //Ask if the person existing should be overwritten
                 do
                 {
                     Console.Clear();
@@ -128,6 +136,9 @@ namespace PersonDatabase.Core
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Removes a person from the database
+        /// </summary>
         void RemovePerson()
         {
             bool tempDone = false;
@@ -172,11 +183,17 @@ namespace PersonDatabase.Core
             } while (!tempDone);
         }
 
+        /// <summary>
+        /// Loads all persons into the program
+        /// </summary>
         void LoadPersons()
         {
             string tempPath = Path.GetFullPath("Database");
             string[] tempFiles = Directory.GetFiles(tempPath, "*.txt");
 
+            int tempInt = 0;
+
+            //Looks through all the files in the directory
             for (int i = 0; i < tempFiles.Length; i++)
             {
                 string tempLine = "";
@@ -188,7 +205,8 @@ namespace PersonDatabase.Core
                 int tempFirstSemiColPos = 0;
                 int tempSecondSemiColPos = 0;
                 int length = 0;
-
+                
+                //Finds the correct semi-colon and gets the text after it
                 tempFirstSemiColPos = tempLine.IndexOf(";", tempFirstSemiColPos);
 
                 string tempFirstname = tempLine.Substring(0, tempFirstSemiColPos);
@@ -210,10 +228,21 @@ namespace PersonDatabase.Core
                 string tempID = tempLine.Substring(tempFirstSemiColPos + 1, length);
 
                 myPersons.Add(new Person(tempFirstname, tempLastname, tempBirthdate, Int32.Parse(tempID)));
-                myLastID++;
+
+                //Sets the highest number of an ID that exist
+                //this is done to not cause problems when creating a new person
+                if (Int32.Parse(tempID) > tempInt)
+                {
+                    tempInt = Int32.Parse(tempID);
+                }
+
+                myLastID = tempInt;
             }
         }
 
+        /// <summary>
+        /// Let's the user to access the persons in the database
+        /// </summary>
         void AccessPerson()
         {
             bool tempDone = false;
@@ -267,6 +296,11 @@ namespace PersonDatabase.Core
             } while (!tempDone);
         }
 
+        /// <summary>
+        /// Checks if a person exists in the database
+        /// </summary>
+        /// <param name="aName">The last and first name of the person to check</param>
+        /// <returns>Returns wether or not the user exists</returns>
         bool CheckForExisting(Tuple<string, string> aName)
         {
             for (int i = 0; i < myPersons.Count; i++)
@@ -280,6 +314,11 @@ namespace PersonDatabase.Core
             return false;
         }
 
+        /// <summary>
+        /// Converts the format YYMMDD to YY/MM/DD
+        /// </summary>
+        /// <param name="aString">The YYMMDD format</param>
+        /// <returns>Returns the input in the YY/MM/DD format</returns>
         string ConvertDateString(string aString)
         {
             string tempString = aString;
@@ -290,6 +329,11 @@ namespace PersonDatabase.Core
             return tempString;
         }
 
+        /// <summary>
+        /// Gets the ID number of a certain person
+        /// </summary>
+        /// <param name="aName">The first and lastname of the person</param>
+        /// <returns>Returns the ID as a string</returns>
         string GetIDFromPerson(Tuple<string, string> aName)
         {
             for (int i = 0; i < myPersons.Count; i++)
