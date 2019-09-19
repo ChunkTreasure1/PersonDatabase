@@ -108,9 +108,31 @@ namespace PersonDatabase.Core
             string tempBirthdate = "";
             do
             {
-                Print.PrintColorText("Enter birthdate(YYMMDD): ", ConsoleColor.Green);
+                Print.PrintColorText("Enter birthdate(YYYYMMDD): ", ConsoleColor.Green);
                 tempBirthdate = Console.ReadLine();
-                if (tempBirthdate.Length == 6)
+                for (int i = 0; i < tempBirthdate.Length; i++)
+                {
+                    if (Char.IsLetter(tempBirthdate[i]))
+                    {
+                        Print.PrintColorText("Birthdate cannot contain letters!", ConsoleColor.Red);
+                        continue;
+                    }
+                }
+                if (tempBirthdate.Length == 0)
+                {
+                    Print.PrintColorText("Birthdate cannot be empty!\n", ConsoleColor.Red);
+                    continue;
+                }
+
+                DateTime tempDT = DateTime.UtcNow.Date;
+
+                if (Int32.Parse(tempDT.ToString("yyyyMMdd")) < Int32.Parse(tempBirthdate))
+                {
+                    Print.PrintColorText("You can not be this age!\n", ConsoleColor.Red);
+                    continue;
+                }
+
+                if (tempBirthdate.Length == 8)
                 {
                     if (!tempBirthdate.Contains(";"))
                     {
@@ -150,11 +172,20 @@ namespace PersonDatabase.Core
             string tempNat = GetNationality();
 
             Console.Clear();
-            Print.PrintColorText("Firstname: " + tempName, ConsoleColor.Green);
-            Print.PrintColorText("Lastname: " + tempLastname, ConsoleColor.Green);
-            Print.PrintColorText("Gender: " + tempGender, ConsoleColor.Green);
-            Print.PrintColorText("Nationality: " + tempNat, ConsoleColor.Green);
-            Print.PrintColorText("Birthdate: " + tempBirthdate, ConsoleColor.Green);
+            Print.PrintColorText("Firstname: ", ConsoleColor.Green);
+            Print.PrintColorText(tempName + "\n", ConsoleColor.Yellow);
+
+            Print.PrintColorText("Lastname: ", ConsoleColor.Green);
+            Print.PrintColorText(tempLastname + "\n", ConsoleColor.Yellow);
+
+            Print.PrintColorText("Gender: ", ConsoleColor.Green);
+            Print.PrintColorText(tempGender + "\n", ConsoleColor.Yellow);
+
+            Print.PrintColorText("Nationality: ", ConsoleColor.Green);
+            Print.PrintColorText(tempNat + "\n", ConsoleColor.Yellow);
+
+            Print.PrintColorText("Birthdate: ", ConsoleColor.Green);
+            Print.PrintColorText(ConvertDateString(tempBirthdate) + "\n", ConsoleColor.Yellow);
 
             //Checks if the person exists in the database
             if (!CheckForExisting(new Tuple<string, string>(tempName, tempLastname)))
@@ -214,6 +245,10 @@ namespace PersonDatabase.Core
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Gets the users nationality via a new menu
+        /// </summary>
+        /// <returns>Returns the nationality the user selects</returns>
         string GetNationality()
         {
             bool tempUsing = true;
@@ -224,8 +259,9 @@ namespace PersonDatabase.Core
             {
                 Console.Clear();
 
+
                 Print.PrintColorText("Current page: " + tempPage + "\n", ConsoleColor.Green);
-                Print.PrintColorText("Next page: N, Last page: L\n\n", ConsoleColor.Green);
+                Print.PrintColorText("Next page: N, Last page: L, Search: S\n\n\n", ConsoleColor.Green);
 
                 if (tempOffset == 190)
                 {
@@ -233,9 +269,11 @@ namespace PersonDatabase.Core
                 }
                 for (int i = tempOffset; i < tempOffset + 10; i++)
                 {
-                    Print.PrintColorText("[" + (i + 1).ToString() + "]. ", ConsoleColor.Green);
+                    Print.PrintColorText("[" + (i + 1).ToString() + "] ", ConsoleColor.Green);
                     Print.PrintColorText(myNationalities[i] + "\n", ConsoleColor.Yellow);
                 }
+
+                Console.SetCursorPosition(0, 2);
 
                 string tempIn = Console.ReadLine();
 
@@ -255,32 +293,107 @@ namespace PersonDatabase.Core
                     }
                 }
 
-                if (tempIn == "N" || tempIn == "n")
+                bool tempKeyPressed = false;
+                do
                 {
-                    if (tempPage < 20)
+                    if (tempIn == "N" || tempIn == "n")
                     {
-                        tempOffset += 10;
-                        tempPage++;
+                        if (tempPage < 20)
+                        {
+                            tempOffset += 10;
+                            tempPage++;
+                        }
+                        else
+                        {
+                            tempOffset = 0;
+                            tempPage = 1;
+                        }
+                        break;
+                    }
+                    if (tempIn == "L" || tempIn == "l")
+                    {
+                        if (tempPage > 1)
+                        {
+                            tempOffset -= 10;
+                            tempPage--;
+                        }
+                        else
+                        {
+                            tempOffset = 190;
+                            tempPage = 20;
+                        }
+                        break;
+                    }
+                    if (tempIn == "S" || tempIn == "s")
+                    {
+                        ConsoleKeyInfo tempCKI;
+                        string tempSearchLine = "";
+                        Console.Clear();
+
+                        bool tempSearching = true;
+                        do
+                        {
+                            Console.Clear();
+                            Print.PrintColorText("Search for nationality(One letter only): ", ConsoleColor.Green);
+
+                            tempCKI = Console.ReadKey();
+                            tempSearchLine += tempCKI.KeyChar.ToString().ToUpper();
+                            Console.Clear();
+
+                            Print.PrintColorText("Search for nationality(One letter only): ", ConsoleColor.Green);
+                            Print.PrintColorText(tempSearchLine + "\n", ConsoleColor.Yellow);
+
+                            //Checks for all elements with first letter equal to the search lines.
+                            //Using for-loops in case of expansion for multiletter search
+                            for (int i = 0; i < myNationalities.Count; i++)
+                            {
+                                for (int j = 0; j < tempSearchLine.Length; j++)
+                                {
+                                    if (myNationalities[i][j] == tempSearchLine[j])
+                                    {
+                                        Print.PrintColorText("[" + (i + 1).ToString() + "] ", ConsoleColor.Green);
+                                        Print.PrintColorText(myNationalities[i] + "\n", ConsoleColor.Yellow);
+                                    }
+                                }
+                            }
+
+                            Print.PrintColorText("\nPress ENTER to select or BACKSPACE to re-search\n", ConsoleColor.Green);
+
+                            tempCKI = Console.ReadKey();
+                            if (tempCKI.Key == ConsoleKey.Backspace)
+                            {
+                                tempSearchLine = "";
+                            }
+                            else
+                            {
+                                Console.WriteLine("");
+
+                                tempIn = Console.ReadLine();
+                                for (int i = 0; i < myNationalities.Count; i++)
+                                {
+                                    int tempNum = 0;
+                                    if (Int32.TryParse(tempIn, out tempNum))
+                                    {
+                                        if (tempNum == (i + 1))
+                                        {
+                                            return myNationalities[i];
+                                        }
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+
+                        } while (tempSearching);
+                        
                     }
                     else
                     {
-                        tempOffset = 0;
-                        tempPage = 1;
+                        tempKeyPressed = true;
                     }
-                }
-                if (tempIn == "L" || tempIn == "l")
-                {
-                    if (tempPage > 1)
-                    {
-                        tempOffset -= 10;
-                        tempPage--;
-                    }
-                    else
-                    {
-                        tempOffset = 190;
-                        tempPage = 20;
-                    }
-                }
+                } while (!tempKeyPressed);
 
             } while (tempUsing);
 
@@ -535,8 +648,8 @@ namespace PersonDatabase.Core
         {
             string tempString = aString;
 
-            tempString = tempString.Insert(2, "/");
-            tempString = tempString.Insert(5, "/");
+            tempString = tempString.Insert(4, "/");
+            tempString = tempString.Insert(7, "/");
 
             return tempString;
         }
