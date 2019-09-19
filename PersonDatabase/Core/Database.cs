@@ -108,6 +108,7 @@ namespace PersonDatabase.Core
             string tempBirthdate = "";
             do
             {
+                //Using YYYYMMDD and not YYMMDD to support people from the 20th century
                 Print.PrintColorText("Enter birthdate(YYYYMMDD): ", ConsoleColor.Green);
                 tempBirthdate = Console.ReadLine();
                 for (int i = 0; i < tempBirthdate.Length; i++)
@@ -149,21 +150,28 @@ namespace PersonDatabase.Core
                 }
             } while (!tempBirth);
 
-            bool tempGenderB = false;
-            string tempGender;
+            bool tempSexB = false;
+            string tempSex;
             do
             {
-                Print.PrintColorText("Enter gender: ", ConsoleColor.Green);
-                tempGender = Console.ReadLine();
-                if (!tempGender.Contains(";"))
+                Print.PrintColorText("Enter sex(Male/Female): ", ConsoleColor.Green);
+                tempSex = Console.ReadLine();
+                if (!tempSex.Contains(";"))
                 {
-                    tempGenderB = true;
+                    tempSexB = true;
                 }
                 else
                 {
-                    Print.PrintColorText("Gender cannot contain semi-colon!", ConsoleColor.Red);
+                    Print.PrintColorText("Sex cannot contain semi-colon!", ConsoleColor.Red);
                 }
-            } while (!tempGenderB);
+
+                if (tempSex != "Male" || tempSex != "Female")
+                {
+                    Print.PrintColorText("Incorrect input!", ConsoleColor.Red);
+                    continue;
+                }
+
+            } while (!tempSexB);
 
             Print.PrintColorText("Press ENTER to choose nationality", ConsoleColor.Green);
             Console.ReadKey();
@@ -178,8 +186,8 @@ namespace PersonDatabase.Core
             Print.PrintColorText("Lastname: ", ConsoleColor.Green);
             Print.PrintColorText(tempLastname + "\n", ConsoleColor.Yellow);
 
-            Print.PrintColorText("Gender: ", ConsoleColor.Green);
-            Print.PrintColorText(tempGender + "\n", ConsoleColor.Yellow);
+            Print.PrintColorText("Sex: ", ConsoleColor.Green);
+            Print.PrintColorText(tempSex + "\n", ConsoleColor.Yellow);
 
             Print.PrintColorText("Nationality: ", ConsoleColor.Green);
             Print.PrintColorText(tempNat + "\n", ConsoleColor.Yellow);
@@ -190,7 +198,7 @@ namespace PersonDatabase.Core
             //Checks if the person exists in the database
             if (!CheckForExisting(new Tuple<string, string>(tempName, tempLastname)))
             {
-                myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, tempGender, tempNat, (myLastID + 1)));
+                myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, tempSex, tempNat, (myLastID + 1)));
 
                 string tempPath = tempPath = Path.GetFullPath("Database/" + (myLastID + 1) + ".txt");
 
@@ -198,7 +206,7 @@ namespace PersonDatabase.Core
                 {
                     using (StreamWriter tempSW = File.CreateText(tempPath))
                     {
-                        tempSW.WriteLine(tempName + ";" + tempLastname + ";" + tempBirthdate + ";" + tempGender + ";" + tempNat + ";" + (myLastID + 1));
+                        tempSW.WriteLine(tempName + ";" + tempLastname + ";" + tempBirthdate + ";" + tempSex + ";" + tempNat + ";" + (myLastID + 1));
                     }
                 }
 
@@ -222,7 +230,7 @@ namespace PersonDatabase.Core
                         string tempPath = tempPath = Path.GetFullPath("Database/" + GetIDFromPerson(new Tuple<string, string>(tempName, tempLastname)) + ".txt");
                         File.Delete(tempPath);
 
-                        myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, tempGender, tempNat, (myLastID + 1)));
+                        myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, tempSex, tempNat, (myLastID + 1)));
                         if (!File.Exists(tempPath))
                         {
                             using (StreamWriter tempSW = File.CreateText(tempPath))
@@ -605,7 +613,7 @@ namespace PersonDatabase.Core
 
                     Print.PrintColorText("Name: " + myPersons[i].GetName().Item1 + "\n", ConsoleColor.Yellow);
                     Print.PrintColorText("Lastname: " + myPersons[i].GetName().Item2 + "\n", ConsoleColor.Yellow);
-                    Print.PrintColorText("Gender: " + myPersons[i].GetGender() + "\n", ConsoleColor.Yellow);
+                    Print.PrintColorText("Sex: " + myPersons[i].GetSex() + "\n", ConsoleColor.Yellow);
                     Print.PrintColorText("Nationality: " + myPersons[i].GetNationality() + "\n", ConsoleColor.Yellow);
 
                     Print.PrintColorText("Birthdate: " + ConvertDateString(myPersons[i].GetBirthdate()) + "\n", ConsoleColor.Yellow);

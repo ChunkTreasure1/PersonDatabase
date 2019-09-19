@@ -12,7 +12,7 @@ namespace PersonDatabase.Core
         private string myLastname;
 
         private string myBirthdate;
-        private string myGender;
+        private string mySex;
         private string myNationality;
 
         private int myId;
@@ -22,13 +22,13 @@ namespace PersonDatabase.Core
         public string GetBirthdate() { return myBirthdate; }
         public int GetID() { return myId; }
         
-        public string GetGender() { return myGender; }
+        public string GetSex() { return mySex; }
         public string GetNationality() { return myNationality; }
 
         //Setting
         public void SetName(string aFirstname, string aLastname) { myFirstname = aFirstname; myLastname = aLastname; }
         public void SetBirthdate(string aDate) { myBirthdate = aDate; }
-        public void SetGender(string aGender) { myGender = aGender; }
+        public void SetGender(string aSex) { mySex = aSex; }
 
         public void SetNationality(string aNationality) { myNationality = aNationality; }
 
