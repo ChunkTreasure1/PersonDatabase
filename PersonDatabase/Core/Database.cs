@@ -7,6 +7,7 @@ namespace PersonDatabase.Core
     class Database
     {
         private List<Person> myPersons = new List<Person>();
+        private List<string> myNationalities = new List<string>();
         private int myLastID = 0;
 
         /// <summary>
@@ -16,6 +17,7 @@ namespace PersonDatabase.Core
         {
             bool tempInMenu = true;
             LoadPersons();
+            LoadNationalities();
 
             while (tempInMenu)
             {
@@ -69,19 +71,95 @@ namespace PersonDatabase.Core
         {
             Console.Clear();
 
-            Print.PrintColorText("Enter firstname: ", ConsoleColor.Green);
-            string tempName = Console.ReadLine();
+            bool tempNameB = false;
+            string tempName = "";
+            do
+            {
+                Print.PrintColorText("Enter firstname: ", ConsoleColor.Green);
+                tempName = Console.ReadLine();
+                if (tempName.Contains(";"))
+                {
+                    Print.PrintColorText("Name cannot contain semi-colon!", ConsoleColor.Red);
+                }
+                else
+                {
+                    tempNameB = true;
+                }
+            } while (!tempNameB);
 
-            Print.PrintColorText("Enter lastname: ", ConsoleColor.Green);
-            string tempLastname = Console.ReadLine();
+            bool tempLastnameB = false;
+            string tempLastname = "";
+            do
+            {
+                Print.PrintColorText("Enter lastname: ", ConsoleColor.Green);
+                tempLastname = Console.ReadLine();
+                if (tempLastname.Contains(";"))
+                {
+                    Print.PrintColorText("Name cannot contain semi-colon!", ConsoleColor.Red);
+                }
+                else
+                {
+                    tempLastnameB = true;
+                }
+            } while (!tempLastnameB);
 
-            Print.PrintColorText("Enter birthdate(YYMMDD): ", ConsoleColor.Green);
-            string tempBirthdate = Console.ReadLine();
+
+            bool tempBirth = false;
+            string tempBirthdate = "";
+            do
+            {
+                Print.PrintColorText("Enter birthdate(YYMMDD): ", ConsoleColor.Green);
+                tempBirthdate = Console.ReadLine();
+                if (tempBirthdate.Length == 6)
+                {
+                    if (!tempBirthdate.Contains(";"))
+                    {
+                        tempBirth = true;
+                    }
+                    else
+                    {
+                        Print.PrintColorText("Birthdate cannot contain semi-colon!", ConsoleColor.Red);
+                    }
+                }
+                else
+                {
+                    Print.PrintColorText("Wrong format!\n", ConsoleColor.Red);
+                }
+            } while (!tempBirth);
+
+            bool tempGenderB = false;
+            string tempGender;
+            do
+            {
+                Print.PrintColorText("Enter gender: ", ConsoleColor.Green);
+                tempGender = Console.ReadLine();
+                if (!tempGender.Contains(";"))
+                {
+                    tempGenderB = true;
+                }
+                else
+                {
+                    Print.PrintColorText("Gender cannot contain semi-colon!", ConsoleColor.Red);
+                }
+            } while (!tempGenderB);
+
+            Print.PrintColorText("Press ENTER to choose nationality", ConsoleColor.Green);
+            Console.ReadKey();
+
+            //bool tempNatGet = false;
+            string tempNat = GetNationality();
+
+            Console.Clear();
+            Print.PrintColorText("Firstname: " + tempName, ConsoleColor.Green);
+            Print.PrintColorText("Lastname: " + tempLastname, ConsoleColor.Green);
+            Print.PrintColorText("Gender: " + tempGender, ConsoleColor.Green);
+            Print.PrintColorText("Nationality: " + tempNat, ConsoleColor.Green);
+            Print.PrintColorText("Birthdate: " + tempBirthdate, ConsoleColor.Green);
 
             //Checks if the person exists in the database
             if (!CheckForExisting(new Tuple<string, string>(tempName, tempLastname)))
             {
-                myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, (myLastID + 1)));
+                myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, tempGender, tempNat, (myLastID + 1)));
 
                 string tempPath = tempPath = Path.GetFullPath("Database/" + (myLastID + 1) + ".txt");
 
@@ -89,7 +167,7 @@ namespace PersonDatabase.Core
                 {
                     using (StreamWriter tempSW = File.CreateText(tempPath))
                     {
-                        tempSW.WriteLine(tempName + ";" + tempLastname + ";" + tempBirthdate + ";" + (myLastID + 1));
+                        tempSW.WriteLine(tempName + ";" + tempLastname + ";" + tempBirthdate + ";" + tempGender + ";" + tempNat + ";" + (myLastID + 1));
                     }
                 }
 
@@ -113,7 +191,7 @@ namespace PersonDatabase.Core
                         string tempPath = tempPath = Path.GetFullPath("Database/" + GetIDFromPerson(new Tuple<string, string>(tempName, tempLastname)) + ".txt");
                         File.Delete(tempPath);
 
-                        myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, (myLastID + 1)));
+                        myPersons.Add(new Person(tempName, tempLastname, tempBirthdate, tempGender, tempNat, (myLastID + 1)));
                         if (!File.Exists(tempPath))
                         {
                             using (StreamWriter tempSW = File.CreateText(tempPath))
@@ -134,6 +212,97 @@ namespace PersonDatabase.Core
             }
             Print.PrintColorText("Press ENTER to exit", ConsoleColor.Green);
             Console.ReadKey();
+        }
+
+        string GetNationality()
+        {
+            bool tempUsing = true;
+
+            int tempPage = 1;
+            int tempOffset = 0;
+            do
+            {
+                Console.Clear();
+
+                Print.PrintColorText("Current page: " + tempPage + "\n", ConsoleColor.Green);
+                Print.PrintColorText("Next page: N, Last page: L\n\n", ConsoleColor.Green);
+
+                if (tempOffset == 190)
+                {
+                    tempOffset--;
+                }
+                for (int i = tempOffset; i < tempOffset + 10; i++)
+                {
+                    Print.PrintColorText("[" + (i + 1).ToString() + "]. ", ConsoleColor.Green);
+                    Print.PrintColorText(myNationalities[i] + "\n", ConsoleColor.Yellow);
+                }
+
+                string tempIn = Console.ReadLine();
+
+                for (int i = 0; i < myNationalities.Count; i++)
+                {
+                    int tempNum = 0;
+                    if (Int32.TryParse(tempIn, out tempNum))
+                    {
+                        if (tempNum == (i + 1))
+                        {
+                            return myNationalities[i];
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                if (tempIn == "N" || tempIn == "n")
+                {
+                    if (tempPage < 20)
+                    {
+                        tempOffset += 10;
+                        tempPage++;
+                    }
+                    else
+                    {
+                        tempOffset = 0;
+                        tempPage = 1;
+                    }
+                }
+                if (tempIn == "L" || tempIn == "l")
+                {
+                    if (tempPage > 1)
+                    {
+                        tempOffset -= 10;
+                        tempPage--;
+                    }
+                    else
+                    {
+                        tempOffset = 190;
+                        tempPage = 20;
+                    }
+                }
+
+            } while (tempUsing);
+
+            return "";
+        }
+
+        /// <summary>
+        /// Checks if the nationality entered by user exists
+        /// </summary>
+        /// <param name="aNat">The nationality to check</param>
+        /// <returns></returns>
+        bool CheckNationality(string aNat)
+        {
+            for (int i = 0; i < myNationalities.Count; i++)
+            {
+                if (myNationalities[i] == aNat)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -223,41 +392,40 @@ namespace PersonDatabase.Core
                     tempLine = tempSR.ReadLine();
                 }
 
-                int tempFirstSemiColPos = 0;
-                int tempSecondSemiColPos = 0;
-                int length = 0;
-                
-                //Finds the correct semi-colon and gets the text after it
-                tempFirstSemiColPos = tempLine.IndexOf(";", tempFirstSemiColPos);
+                string[] tempData = tempLine.Split(';');
 
-                string tempFirstname = tempLine.Substring(0, tempFirstSemiColPos);
-
-                tempSecondSemiColPos = tempLine.IndexOf(";", tempFirstSemiColPos + 1);
-
-
-                length = tempSecondSemiColPos - tempFirstSemiColPos - 1;
-                string tempLastname = tempLine.Substring(tempFirstSemiColPos + 1, length);
-
-                tempFirstSemiColPos = tempLine.IndexOf(";", tempSecondSemiColPos + 1);
-
-                length = tempFirstSemiColPos - tempSecondSemiColPos;
-                string tempBirthdate = tempLine.Substring(tempSecondSemiColPos + 1, length - 1);
-
-                tempFirstSemiColPos = tempLine.IndexOf(";", tempSecondSemiColPos + 1);
-
-                length = tempLine.Length - 1 - tempFirstSemiColPos;
-                string tempID = tempLine.Substring(tempFirstSemiColPos + 1, length);
-
-                myPersons.Add(new Person(tempFirstname, tempLastname, tempBirthdate, Int32.Parse(tempID)));
+                myPersons.Add(new Person(tempData[0], tempData[1], tempData[2], tempData[3], tempData[4], Int32.Parse(tempData[5])));
 
                 //Sets the highest number of an ID that exist
                 //this is done to not cause problems when creating a new person
-                if (Int32.Parse(tempID) > tempInt)
+                if (Int32.Parse(tempData[5]) > tempInt)
                 {
-                    tempInt = Int32.Parse(tempID);
+                    tempInt = Int32.Parse(tempData[5]);
                 }
 
                 myLastID = tempInt;
+            }
+        }
+
+        /// <summary>
+        /// Loads all the nationalities into the program
+        /// </summary>
+        void LoadNationalities()
+        {
+            string tempPath = Path.GetFullPath("Core");
+            string[] tempFiles = Directory.GetFiles(tempPath, "*.txt");
+
+            string tempLine = "";
+
+            using (StreamReader tempSR = new StreamReader(tempFiles[0]))
+            {
+                tempLine = tempSR.ReadLine();
+            }
+
+            string[] tempArr = tempLine.Split(';');
+            for (int i = 0; i < tempArr.Length; i++)
+            {
+                myNationalities.Add(tempArr[i]);
             }
         }
 
@@ -324,6 +492,8 @@ namespace PersonDatabase.Core
 
                     Print.PrintColorText("Name: " + myPersons[i].GetName().Item1 + "\n", ConsoleColor.Yellow);
                     Print.PrintColorText("Lastname: " + myPersons[i].GetName().Item2 + "\n", ConsoleColor.Yellow);
+                    Print.PrintColorText("Gender: " + myPersons[i].GetGender() + "\n", ConsoleColor.Yellow);
+                    Print.PrintColorText("Nationality: " + myPersons[i].GetNationality() + "\n", ConsoleColor.Yellow);
 
                     Print.PrintColorText("Birthdate: " + ConvertDateString(myPersons[i].GetBirthdate()) + "\n", ConsoleColor.Yellow);
 

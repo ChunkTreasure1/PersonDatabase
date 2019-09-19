@@ -12,23 +12,34 @@ namespace PersonDatabase.Core
         private string myLastname;
 
         private string myBirthdate;
+        private string myGender;
+        private string myNationality;
+
         private int myId;
 
         //Getting
         public Tuple<string, string> GetName() { return Tuple.Create(myFirstname, myLastname); }
         public string GetBirthdate() { return myBirthdate; }
         public int GetID() { return myId; }
+        
+        public string GetGender() { return myGender; }
+        public string GetNationality() { return myNationality; }
 
         //Setting
         public void SetName(string aFirstname, string aLastname) { myFirstname = aFirstname; myLastname = aLastname; }
         public void SetBirthdate(string aDate) { myBirthdate = aDate; }
+        public void SetGender(string aGender) { myGender = aGender; }
 
-        public Person(string aFirst, string aLast, string aBirth, int anId)
+        public void SetNationality(string aNationality) { myNationality = aNationality; }
+
+        public Person(string aFirst, string aLast, string aBirth, string aGender, string aNat, int anId)
         {
             myFirstname = aFirst;
             myLastname = aLast;
             myBirthdate = aBirth;
 
+            myGender = aGender;
+            myNationality = aNat;
             myId = anId;
         }
     }
