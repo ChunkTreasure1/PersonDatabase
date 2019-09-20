@@ -32,13 +32,13 @@ namespace PersonDatabase.Core
 
         public void SetNationality(string aNationality) { myNationality = aNationality; }
 
-        public Person(string aFirst, string aLast, string aBirth, string aGender, string aNat, int anId)
+        public Person(string aFirst, string aLast, string aBirth, string aSex, string aNat, int anId)
         {
             myFirstname = aFirst;
             myLastname = aLast;
             myBirthdate = aBirth;
 
-            myGender = aGender;
+            mySex = aSex;
             myNationality = aNat;
             myId = anId;
         }
