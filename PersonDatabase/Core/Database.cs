@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PersonDatabase.Core
 {
@@ -83,14 +84,13 @@ namespace PersonDatabase.Core
                 }
                 else
                 {
-                    for (int i = 0; i < tempName.Length; i++)
+                    bool tempIsNum = !tempName.All(Char.IsLetter);
+                    if (tempIsNum)
                     {
-                        if (Char.IsNumber(tempName[i]))
-                        {
-                            Print.PrintColorText("Name cannot contain numbers!\n", ConsoleColor.Red);
-                            continue;
-                        }
+                        Print.PrintColorText("Name cannot contain non-letters!\n", ConsoleColor.Red);
+                        continue;
                     }
+
                     if (tempName.Length == 0)
                     {
                         Print.PrintColorText("Name cannot be empty!\n", ConsoleColor.Red);
@@ -112,15 +112,13 @@ namespace PersonDatabase.Core
                 }
                 else
                 {
-                    for (int i = 0; i < tempName.Length; i++)
+                    bool tempIsNum = !tempLastname.All(Char.IsLetter);
+                    if (tempIsNum)
                     {
-                        if (Char.IsNumber(tempName[i]))
-                        {
-                            Print.PrintColorText("Lastname cannot contain numbers!\n", ConsoleColor.Red);
-                            continue;
-                        }
+                        Print.PrintColorText("Lastname cannot contain non-letters!\n", ConsoleColor.Red);
+                        continue;
                     }
-                    if (tempName.Length == 0)
+                    if (tempLastname.Length == 0)
                     {
                         Print.PrintColorText("Lastname cannot be empty!\n", ConsoleColor.Red);
                         continue;
@@ -136,22 +134,21 @@ namespace PersonDatabase.Core
                 //Using YYYYMMDD and not YYMMDD to support people from the 20th century
                 Print.PrintColorText("Enter birthdate(YYYYMMDD): ", ConsoleColor.Green);
                 tempBirthdate = Console.ReadLine();
-                for (int i = 0; i < tempBirthdate.Length; i++)
+
+                bool tempIsNum = !tempBirthdate.All(Char.IsNumber);
+                if (tempIsNum)
                 {
-                    if (Char.IsLetter(tempBirthdate[i]))
-                    {
-                        Print.PrintColorText("Birthdate cannot contain letters!", ConsoleColor.Red);
-                        continue;
-                    }
+                    Print.PrintColorText("Birthdate cannot contain non-numbers!\n", ConsoleColor.Red);
+                    continue;
                 }
+
                 if (tempBirthdate.Length == 0)
                 {
                     Print.PrintColorText("Birthdate cannot be empty!\n", ConsoleColor.Red);
                     continue;
                 }
 
-                    DateTime tempDT = DateTime.UtcNow.Date;
-
+                DateTime tempDT = DateTime.UtcNow.Date;
                 if (Int32.Parse(tempDT.ToString("yyyyMMdd")) < Int32.Parse(tempBirthdate))
                 {
                     Print.PrintColorText("You can not be this age!\n", ConsoleColor.Red);
