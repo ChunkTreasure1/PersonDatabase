@@ -125,7 +125,7 @@ namespace PersonDatabase.Core
                     continue;
                 }
 
-                DateTime tempDT = DateTime.UtcNow.Date;
+                    DateTime tempDT = DateTime.UtcNow.Date;
 
                 if (Int32.Parse(tempDT.ToString("yyyyMMdd")) < Int32.Parse(tempBirthdate))
                 {
