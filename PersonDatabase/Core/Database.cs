@@ -79,10 +79,23 @@ namespace PersonDatabase.Core
                 tempName = Console.ReadLine();
                 if (tempName.Contains(";"))
                 {
-                    Print.PrintColorText("Name cannot contain semi-colon!", ConsoleColor.Red);
+                    Print.PrintColorText("Name cannot contain semi-colon!\n", ConsoleColor.Red);
                 }
                 else
                 {
+                    for (int i = 0; i < tempName.Length; i++)
+                    {
+                        if (Char.IsNumber(tempName[i]))
+                        {
+                            Print.PrintColorText("Name cannot contain numbers!\n", ConsoleColor.Red);
+                            continue;
+                        }
+                    }
+                    if (tempName.Length == 0)
+                    {
+                        Print.PrintColorText("Name cannot be empty!\n", ConsoleColor.Red);
+                        continue;
+                    }
                     tempNameB = true;
                 }
             } while (!tempNameB);
@@ -95,14 +108,26 @@ namespace PersonDatabase.Core
                 tempLastname = Console.ReadLine();
                 if (tempLastname.Contains(";"))
                 {
-                    Print.PrintColorText("Name cannot contain semi-colon!", ConsoleColor.Red);
+                    Print.PrintColorText("Lastname cannot contain semi-colon!\n", ConsoleColor.Red);
                 }
                 else
                 {
+                    for (int i = 0; i < tempName.Length; i++)
+                    {
+                        if (Char.IsNumber(tempName[i]))
+                        {
+                            Print.PrintColorText("Lastname cannot contain numbers!\n", ConsoleColor.Red);
+                            continue;
+                        }
+                    }
+                    if (tempName.Length == 0)
+                    {
+                        Print.PrintColorText("Lastname cannot be empty!\n", ConsoleColor.Red);
+                        continue;
+                    }
                     tempLastnameB = true;
                 }
             } while (!tempLastnameB);
-
 
             bool tempBirth = false;
             string tempBirthdate = "";
@@ -158,17 +183,19 @@ namespace PersonDatabase.Core
                 tempSex = Console.ReadLine();
                 if (!tempSex.Contains(";"))
                 {
-                    tempSexB = true;
+                    if (tempSex == "Male" || tempSex == "Female")
+                    {
+                        tempSexB = true;
+                    }
                 }
                 else
                 {
                     Print.PrintColorText("Sex cannot contain semi-colon!", ConsoleColor.Red);
                 }
 
-                if (tempSex != "Male" || tempSex != "Female")
+                if (tempSex != "Male" && tempSex != "Female")
                 {
-                    Print.PrintColorText("Incorrect input!", ConsoleColor.Red);
-                    continue;
+                    Print.PrintColorText("Incorrect input!\n", ConsoleColor.Red);
                 }
 
             } while (!tempSexB);
